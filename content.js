@@ -1,4 +1,3 @@
-document.title = "МикиВики"
 count = 0
 
 function createWrap() {
@@ -14,16 +13,69 @@ function createWrap() {
         count=count+1;
         console.log(count);
         console.log('Элемент найден:', targetH3);
-        const wrapperSpan = document.createElement('span');
+        const wrapperSpan = document.createElement('div');
 
-        wrapperSpan.style.cursor = 'pointer';
-        wrapperSpan.style.backgroundColor = '#f0f0f0';
-        wrapperSpan.style.padding = '5px';
+        // Стили для обертки
+        wrapperSpan.style.border = '1px solid #ccc';
+        wrapperSpan.style.padding = '10px';
+        wrapperSpan.style.margin = '10px 0';
 
+        // Обернуть h3
         targetH3.parentNode.insertBefore(wrapperSpan, targetH3);
         wrapperSpan.appendChild(targetH3);
         
-        wrapperSpan.addEventListener('click', clickWrap);
+        // Создать контейнер для кнопок
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.display = 'flex';
+        buttonContainer.style.gap = '5px';
+        buttonContainer.style.marginTop = '8px';
+
+        for (let i = 1; i <= 5; i++) {
+            const button = createButton(i);
+
+            button.addEventListener('click', (e) => {
+              e.stopPropagation(); // Предотвращаем всплытие события
+                
+              setGradeInput(i);
+
+              button.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    button.style.transform = '';
+                }, 200);
+            });
+        
+            buttonContainer.appendChild(button);
+          }
+        
+        const plus = createButton('+');
+        plus.addEventListener('click', (e) => {
+            e.stopPropagation(); // Предотвращаем всплытие события
+              
+            plusGradeInput();
+
+            button.style.transform = 'scale(0.95)';
+              setTimeout(() => {
+                  button.style.transform = '';
+              }, 200);
+          });
+      
+        buttonContainer.appendChild(plus);
+
+        const minus = createButton('-');
+        minus.addEventListener('click', (e) => {
+            e.stopPropagation(); // Предотвращаем всплытие события
+              
+            minusGradeInput();
+
+            button.style.transform = 'scale(0.95)';
+              setTimeout(() => {
+                  button.style.transform = '';
+              }, 200);
+          });
+      
+        buttonContainer.appendChild(minus);
+        // Добавить кнопки в обертку
+        wrapperSpan.appendChild(buttonContainer);
     } 
     else 
     {
@@ -33,39 +85,84 @@ function createWrap() {
 
 document.addEventListener('DOMContentLoaded', createWrap);
 
-function clickWrap() {
-    const needDiv = document.getElementsByClassName('assignsubmission_file')[0];
-    
-    if (!needDiv) {
-      console.log('Не нашел');
-      return;
-    }
-
-    console.log('Нашел');
-
-    const links = needDiv.querySelectorAll('a');
-  
-    links.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault(); // Отменяем стандартное действие
-                window.open(link.href, '_blank');
-            });
-    
-            const imgPreview = document.createElement('img');
-            
-            console.log('Нашел' + link.href);
-            imgPreview.src = link.href;
-            imgPreview.style.maxWidth = '100px';
-            imgPreview.style.margin = '5px';
-            link.parentNode.insertBefore(imgPreview, link);
-      });
+function createButton(value) {
+    const button = document.createElement('button');
+    button.style.padding = '6px 12px';
+    button.style.cursor = 'pointer';
+    button.style.backgroundColor = '#f0f0f0';
+    button.style.border = '1px solid #999';
+    button.style.borderRadius = '4px';
+    button.textContent = value;
+    return button;
 }
 
+function setGradeInput(value) {
+    const gradeInput = document.getElementById('id_grade');
+    
+    if (gradeInput) {
+      gradeInput.value = value;
+      console.log(`Значение ${value} записано в id_grade`);
+      
+      // Дополнительно: подсветить поле на 1 секунду
+      gradeInput.style.transition = 'none';
+      gradeInput.style.backgroundColor = '#e0ffe0';
+      setTimeout(() => {
+        gradeInput.style.backgroundColor = '';
+        gradeInput.style.transition = 'background 0.3s';
+      }, 1000);
+    } else {
+      console.error('Элемент id_grade не найден!');
+    }
+}
+function minusGradeInput() {
+    const gradeInput = document.getElementById('id_grade');
+    
+    if (gradeInput) {
+        value = Number(gradeInput.value);
+        if(value > 5 && value < 0){
+            return;
+        }
 
+        gradeInput.value = value - Number(0.5);
+        console.log(`Значение ${value} записано в id_grade`);
+        
+        // Дополнительно: подсветить поле на 1 секунду
+        gradeInput.style.transition = 'none';
+        gradeInput.style.backgroundColor = '#e0ffe0';
+        setTimeout(() => {
+            gradeInput.style.backgroundColor = '';
+            gradeInput.style.transition = 'background 0.3s';
+      }, 1000);
+    } else {
+      console.error('Элемент id_grade не найден!');
+    }
+}
+
+function plusGradeInput() {
+    const gradeInput = document.getElementById('id_grade');
+    
+    if (gradeInput) {
+        value = Number(gradeInput.value);
+        if(value > 5 && value < 0){
+            return;
+        }
+
+        gradeInput.value = value + Number(0.5);
+        console.log(`Значение ${value} записано в id_grade`);
+        
+        // Дополнительно: подсветить поле на 1 секунду
+        gradeInput.style.transition = 'none';
+        gradeInput.style.backgroundColor = '#e0ffe0';
+        setTimeout(() => {
+            gradeInput.style.backgroundColor = '';
+            gradeInput.style.transition = 'background 0.3s';
+      }, 1000);
+    } else {
+      console.error('Элемент id_grade не найден!');
+    }
+}
 
 new MutationObserver(createWrap).observe(document.body, {
     childList: true,
     subtree: true
 });
-
-  

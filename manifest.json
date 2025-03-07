@@ -10,9 +10,9 @@
     "content_scripts": [
     {
       "js": ["content.js"],
-      "matches":["https://lycedu.urfu.ru/mod/*"],
+      "matches":["https://lycedu.urfu.ru/mod/assign/view.php*"],
       "run_at": "document_end"
     }
   ],
-  "host_permissions": ["https://lycedu.urfu.ru/mod/*"]
+  "host_permissions": ["https://lycedu.urfu.ru/mod/assign/view.php*"]
 }

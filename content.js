@@ -1,6 +1,8 @@
-count = 0
-
 function createWrap() {
+    const wrapper = document.getElementById('lazy_rating_block');
+    if(wrapper){
+        return;
+    }
     // Найти все элементы h3
     const allH3 = Array.from(document.querySelectorAll('h3'));
 
@@ -9,13 +11,10 @@ function createWrap() {
         h3.textContent === 'Оценка'
     );
 
-    if (targetH3 && count == 0) {
-        count=count+1;
-        console.log(count);
+    if (targetH3) {
         console.log('Элемент найден:', targetH3);
         const wrapperSpan = document.createElement('div');
-
-        // Стили для обертки
+        wrapperSpan.id = 'lazy_rating_block';
         wrapperSpan.style.border = '1px solid #ccc';
         wrapperSpan.style.padding = '10px';
         wrapperSpan.style.margin = '10px 0';

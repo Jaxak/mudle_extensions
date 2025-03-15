@@ -12,6 +12,7 @@ function createWrap() {
     );
 
     if (targetH3) {
+        initGradeInput();
         console.log('Элемент найден:', targetH3);
         const wrapperSpan = document.createElement('div');
         wrapperSpan.id = 'lazy_rating_block';
@@ -28,6 +29,20 @@ function createWrap() {
         buttonContainer.style.display = 'flex';
         buttonContainer.style.gap = '5px';
         buttonContainer.style.marginTop = '8px';
+
+        const minus = createButton('-');
+        minus.addEventListener('click', (e) => {
+            e.stopPropagation(); // Предотвращаем всплытие события
+              
+            minusGradeInput();
+
+            button.style.transform = 'scale(0.95)';
+              setTimeout(() => {
+                  button.style.transform = '';
+              }, 200);
+          });
+      
+        buttonContainer.appendChild(minus);
 
         for (let i = 1; i <= 5; i++) {
             const button = createButton(i);
@@ -60,19 +75,6 @@ function createWrap() {
       
         buttonContainer.appendChild(plus);
 
-        const minus = createButton('-');
-        minus.addEventListener('click', (e) => {
-            e.stopPropagation(); // Предотвращаем всплытие события
-              
-            minusGradeInput();
-
-            button.style.transform = 'scale(0.95)';
-              setTimeout(() => {
-                  button.style.transform = '';
-              }, 200);
-          });
-      
-        buttonContainer.appendChild(minus);
         // Добавить кнопки в обертку
         wrapperSpan.appendChild(buttonContainer);
     } 
@@ -95,6 +97,12 @@ function createButton(value) {
     return button;
 }
 
+function initGradeInput(){
+  const gradeInput = document.getElementById('id_grade');
+      setGradeInput(gradeInput.value === '' ? 0 : gradeInput.value);
+}
+
+
 function setGradeInput(value) {
     const gradeInput = document.getElementById('id_grade');
     
@@ -113,6 +121,7 @@ function setGradeInput(value) {
       console.error('Элемент id_grade не найден!');
     }
 }
+
 function minusGradeInput() {
     const gradeInput = document.getElementById('id_grade');
     

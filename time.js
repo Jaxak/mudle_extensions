@@ -1,4 +1,5 @@
 let isInit = false;
+let isSettingsInit = false;
 
 function updateDates() {
     // Элементы начальной даты
@@ -44,23 +45,24 @@ function updateDates() {
     cutoffDate.setDate(cutoffDate.getDate() + 2);
 
     setSelectValue(allowHour, '16');
-    setSelectValue(allowMinuts, '0')
+    setSelectValue(allowMinuts, '0');
 
     // Обновляем Due Date
     setSelectValue(dueDay, dueDate.getDate());
     setSelectValue(dueMonth, dueDate.getMonth() + 1); // Возвращаем нормальный месяц
     setSelectValue(dueYear, dueDate.getFullYear());
     setSelectValue(dueHour, '23');
-    setSelectValue(dueMinuts, '59')
+    setSelectValue(dueMinuts, '59');
 
     // Обновляем Cutoff Date
     setSelectValue(cutoffDay, cutoffDate.getDate());
     setSelectValue(cutoffMonth, cutoffDate.getMonth() + 1);
     setSelectValue(cutoffYear, cutoffDate.getFullYear());
     setSelectValue(cutoffHour, '23');
-    setSelectValue(cutoffMinuts, '59')
-}
+    setSelectValue(cutoffMinuts, '59');
 
+    setSettingsGroupDefaultValues();
+}
 
 function init(){
     if(isInit){
@@ -68,8 +70,11 @@ function init(){
     }
     // Элементы начальной даты
     const allowDay = document.getElementById('id_allowsubmissionsfromdate_day');
+    if(!allowDay) return;
     const allowMonth = document.getElementById('id_allowsubmissionsfromdate_month');
+    if(!allowMonth) return;
     const allowYear = document.getElementById('id_allowsubmissionsfromdate_year');
+    if(!allowYear) return;
 
     allowDay.addEventListener('change', updateDates);
     allowMonth.addEventListener('change', updateDates);
@@ -79,6 +84,34 @@ function init(){
     [allowDay, allowMonth, allowYear].forEach(element => {
         element.addEventListener('change', updateDates);
     });
+
+    
+    expandSettingsBlock();
+    isInit = true;
+}
+
+// Функция для раскрытия блока настроек
+function expandSettingsBlock() {
+    const fieldset = document.querySelector('fieldset#id_modstandardelshdr');
+    if (!fieldset) return false;
+
+    // Проверяем, свернут ли блок
+    const isCollapsed = fieldset.classList.contains('collapsed');
+    if (!isCollapsed) return true; // Уже раскрыт
+
+    // Находим кнопку/ссылку для раскрытия
+    const toggleLink = fieldset.querySelector('legend.ftoggler a.fheader');
+    if (!toggleLink) return false;
+
+    // Создаем и отправляем событие клика для раскрытия
+    const clickEvent = new MouseEvent('click', {
+        view: window,
+        bubbles: true,
+        cancelable: true
+    });
+    
+    toggleLink.dispatchEvent(clickEvent);
+    return true;
 }
 
 function setSelectValue(selectElement, value) {
@@ -88,6 +121,92 @@ function setSelectValue(selectElement, value) {
     } else {
         console.warn(`Option ${value} not found in`, selectElement);
     }
+}
+
+function setSettingsGroupDefaultValues() {
+    // Находим блок с общими настройками модуля
+    const fieldset = document.querySelector('fieldset#id_modstandardelshdr');
+    if (!fieldset || isSettingsInit) return;
+    console.log('Нашли', fieldset);
+
+    const changedSettings = [];
+    changedSettings.push('Общие настройки модуля изменены на рекомендуемые:\n');
+    setDefaultVisible(fieldset, changedSettings);
+    setDefaultGroupMode(fieldset, changedSettings);
+    setDefaultGrouping(fieldset, changedSettings);
+    if(changedSettings.length > 1){
+        showNotification(changedSettings);
+    }
+    isSettingsInit = true;
+}
+
+function setDefaultVisible(fieldset, changedSettings){
+    // Устанавливаем значение "Отображать на странице курса" для доступности
+    setValue(fieldset, 'select#id_visible', 'Отображать на странице курса', changedSettings);
+}
+
+function setDefaultGroupMode(fieldset, changedSettings){
+    // Устанавливаем значение для группового режима
+    setValue(fieldset, 'select#id_groupmode', 'Изолированные группы', changedSettings);
+}
+
+function setDefaultGrouping(fieldset, changedSettings){
+    // Устанавливаем значение для потока
+    setValue(fieldset, 'select#id_groupingid', 'Пусто', changedSettings);
+}
+
+function setValue(fieldset, selector, value, changedSettings){
+    const select = fieldset.querySelector(selector);
+    if (select) {
+        const emptyOption = Array.from(select.options).find(opt => 
+            opt.textContent.trim() === value
+        );
+        if (emptyOption && emptyOption.value != select.value) {
+            select.value = emptyOption.value;
+            changedSettings.push("➡️ " + value);
+        }
+    }
+}
+
+function showNotification(message) {
+    // Создаем элемент уведомления
+    const notification = document.createElement('div');
+    console.log(message);
+    notification.id = 'showNotification';
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 5px;
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        z-index: 10000;
+        max-width: 80%;
+        min-width: 200px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        opacity: 0;
+        transform: translateX(100px);
+        transition: opacity 0.3s, transform 0.3s;
+        white-space: pre-line; /* Это свойство позволяет отображать переносы строк */
+    `;
+    notification.style.backgroundColor = '#4CAF50';
+    notification.textContent = message.join("\n");
+    document.body.appendChild(notification);
+
+    // Показываем уведомление
+    setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateX(0)';
+    }, 10);
+
+    // Скрываем через 5 секунды
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100px)';
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
 }
 
 document.addEventListener('DOMContentLoaded', init);

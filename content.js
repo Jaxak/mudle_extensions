@@ -3,6 +3,7 @@ function createWrap() {
     if(wrapper){
         return;
     }
+    handleModal();
     // Найти все элементы h3
     const allH3 = Array.from(document.querySelectorAll('h3'));
 
@@ -169,6 +170,51 @@ function plusGradeInput() {
       console.error('Элемент id_grade не найден!');
     }
 }
+
+function handleModal() {
+        const okButton = document.querySelector('.modal.show')?.querySelector('button.btn-primary[data-action="cancel"]');
+        if (!okButton) return;
+        console.log('Нашли ', okButton);
+        const clickEvent = new MouseEvent('click', {
+            view: window,
+            bubbles: true,
+            cancelable: true
+        });
+        okButton.dispatchEvent(clickEvent);
+        showCheckmark();
+    }
+
+function showCheckmark() {
+        const checkmark = document.createElement('div');
+        checkmark.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.5s;
+        `;
+
+        checkmark.innerHTML = `
+            <svg viewBox="0 0 65 65" style="width: 90%; height: 90%;">
+                <path fill="none" stroke="#4CAF50" stroke-width="4" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
+        `;
+
+        document.body.appendChild(checkmark);
+
+        // Плавное появление
+        setTimeout(() => checkmark.style.opacity = '1', 10);
+
+        // Исчезновение через секунду
+        setTimeout(() => {
+            checkmark.style.opacity = '0';
+            setTimeout(() => checkmark.remove(), 500);
+        }, 1000);
+    }
 
 new MutationObserver(createWrap).observe(document.body, {
     childList: true,
